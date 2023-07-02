@@ -1,8 +1,20 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
+import * as morgan from 'morgan';
 import { PokemonModule } from './pokemon.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(PokemonModule);
-  await app.listen(3000);
+  const configService = app.get<ConfigService>(ConfigService);
+
+  const PORT = configService.get('PORT');
+
+  app.use(helmet());
+  app.use(morgan('dev'));
+
+  await app.listen(PORT, () =>
+    console.log(`Pokemon service is listening to requests on port: ${PORT}`),
+  );
 }
 bootstrap();
